@@ -33,14 +33,15 @@ try {
   const output = rows
     .filter((line) => line)
     .map(parseLine)
-    .filter(({ sets }) => (
-      sets.every(({ red = 0, green = 0, blue = 0 }) => (
-        red <= expected.red
-        && green <= expected.green
-        && blue <= expected.blue
-      ))
+    .map(({ sets }) => (
+      Object.values(
+        sets.reduce((minSet, set) => ({
+          red: Math.max(minSet.red, set.red),
+          blue: Math.max(minSet.blue, set.blue),
+          green: Math.max(minSet.green, set.green),
+        }), { red: 0, green: 0, blue: 0 })
+      ).reduce((product, number) => product * number, 1)
     ))
-    .map(({ id }) => id)
     .reduce((sum, number) => sum + number, 0);
 
   console.log(output);
